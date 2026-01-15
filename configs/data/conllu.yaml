@@ -8,5 +8,5 @@ num_workers: 0
 pin_memory: False
 tokenizer:
   _target_: transformers.AutoTokenizer.from_pretrained
-  pretrained_model_name_or_path: "vietnamese-nlp/vietnamese-roberta-base" # Placeholder, user can override
+  pretrained_model_name_or_path: "vinai/phobert-base" # Placeholder, user can override
   use_fast: True # Recommended for better performance
