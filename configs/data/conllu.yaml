@@ -3,9 +3,9 @@ data_dir: ${paths.data_dir}
 train_file: "vi_vtb-ud-train.conllu"
 val_file: "vi_vtb-ud-dev.conllu"
 test_file: "vi_vtb-ud-test.conllu"
-batch_size: 64
-num_workers: 0
-pin_memory: False
+batch_size: 256
+num_workers: 4 # Increased from 0 for better data loading parallelism
+pin_memory: True # Set to True for faster data transfer to GPU
 tokenizer:
   _target_: transformers.AutoTokenizer.from_pretrained
   pretrained_model_name_or_path: "vinai/phobert-base" # Placeholder, user can override
