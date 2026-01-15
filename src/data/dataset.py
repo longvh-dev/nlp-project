@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
-from path import Path
+from pathlib import Path
 from lightning import LightningDataModule
 from typing import Any, Dict, Optional, Tuple
 from transformers import AutoTokenizer
