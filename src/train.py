@@ -56,6 +56,41 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
 
     log.info(f"Instantiating datamodule <{cfg.data._target_}>")
     datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data)
+    datamodule.prepare_data()  # Ensure data is ready (e.g., downloaded)
+    datamodule.setup()  # Build rel_vocab and tokenizer
+
+    # Dynamically inject vocab_size and num_relations into model config if it's the DependencyParserModule
+    if (
+        "_target_" in cfg.model
+        and "dependency_parser_module.DependencyParserModule" in cfg.model._target_
+    ):
+        log.info(
+            "Injecting vocab_size and num_relations into DependencyParserModule config."
+        )
+        if datamodule.tokenizer is None:
+            raise ValueError(
+                "Tokenizer not initialized in datamodule. Check data config."
+            )
+        cfg.model.vocab_size = datamodule.tokenizer.vocab_size
+
+        # Ensure data_train is set up to access rel_vocab
+        if datamodule.data_train is None:
+            raise ValueError(
+                "Training data not set up in datamodule. Check data config."
+            )
+
+        # Access rel_vocab from the DependencyDataset instance
+        # The rel_vocab is built in the DependencyDataset during datamodule.setup()
+        if hasattr(datamodule.data_train, "rel_vocab"):
+            cfg.model.num_relations = len(datamodule.data_train.rel_vocab)
+        else:
+            raise AttributeError(
+                "datamodule.data_train does not have 'rel_vocab' attribute. Ensure DependencyDataset is used."
+            )
+
+        log.info(
+            f"Injected vocab_size: {cfg.model.vocab_size}, num_relations: {cfg.model.num_relations}"
+        )
 
     log.info(f"Instantiating model <{cfg.model._target_}>")
     model: LightningModule = hydra.utils.instantiate(cfg.model)
@@ -67,7 +102,9 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     logger: List[Logger] = instantiate_loggers(cfg.get("logger"))
 
     log.info(f"Instantiating trainer <{cfg.trainer._target_}>")
-    trainer: Trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
+    trainer: Trainer = hydra.utils.instantiate(
+        cfg.trainer, callbacks=callbacks, logger=logger
+    )
 
     object_dict = {
         "cfg": cfg,

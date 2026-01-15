@@ -1,0 +1,12 @@
+_target_: src.data.dataset.ConlluDataModule
+data_dir: ${paths.data_dir}
+train_file: "vi_vtb-ud-train.conllu"
+val_file: "vi_vtb-ud-dev.conllu"
+test_file: "vi_vtb-ud-test.conllu"
+batch_size: 64
+num_workers: 0
+pin_memory: False
+tokenizer:
+  _target_: transformers.AutoTokenizer.from_pretrained
+  pretrained_model_name_or_path: "vietnamese-nlp/vietnamese-roberta-base" # Placeholder, user can override
+  use_fast: True # Recommended for better performance

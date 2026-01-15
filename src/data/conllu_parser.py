@@ -1,5 +1,6 @@
 from typing import List, Dict, Any
 
+
 class Token:
     def __init__(self, fields: List[str]):
         self.id = fields[0]
@@ -16,14 +17,16 @@ class Token:
     def __repr__(self):
         return f"Token(id={self.id}, form='{self.form}', upos='{self.upos}', deprel='{self.deprel}')"
 
+
 class Sentence:
     def __init__(self, tokens: List[Token], metadata: Dict[str, str]):
         self.tokens = tokens
         self.metadata = metadata
 
     def __repr__(self):
-        text = self.metadata.get('text', 'N/A')
+        text = self.metadata.get("text", "N/A")
         return f"Sentence(text='{text}', num_tokens={len(self.tokens)})"
+
 
 def parse_conllu(file_path: str) -> List[Sentence]:
     sentences = []
@@ -31,7 +34,7 @@ def parse_conllu(file_path: str) -> List[Sentence]:
     current_metadata: Dict[str, str] = {}
 
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if not line:  # Empty line indicates end of sentence
@@ -39,12 +42,12 @@ def parse_conllu(file_path: str) -> List[Sentence]:
                         sentences.append(Sentence(current_tokens, current_metadata))
                     current_tokens = []
                     current_metadata = {}
-                elif line.startswith('#'):  # Metadata line
-                    parts = line[1:].strip().split('=', 1)
+                elif line.startswith("#"):  # Metadata line
+                    parts = line[1:].strip().split("=", 1)
                     if len(parts) == 2:
                         current_metadata[parts[0].strip()] = parts[1].strip()
                 else:  # Token line
-                    fields = line.split('\t')
+                    fields = line.split("\t")
                     if len(fields) == 10:
                         current_tokens.append(Token(fields))
                     else:
@@ -60,7 +63,8 @@ def parse_conllu(file_path: str) -> List[Sentence]:
 
     return sentences
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Example usage:
     # Assuming a dummy.conllu file exists for testing
     dummy_conllu_content = """

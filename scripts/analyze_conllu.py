@@ -4,6 +4,7 @@ from typing import List
 
 from src.data.conllu_parser import parse_conllu, Sentence, Token
 
+
 def analyze_dataset(file_path: str, name: str):
     print(f"\n--- Analyzing {name} dataset: {file_path} ---")
     sentences: List[Sentence] = parse_conllu(file_path)
@@ -14,7 +15,7 @@ def analyze_dataset(file_path: str, name: str):
 
     num_sentences = len(sentences)
     num_tokens = sum(len(s.tokens) for s in sentences)
-    
+
     upos_tags = Counter()
     deprel_tags = Counter()
     sentence_lengths = []
@@ -22,9 +23,9 @@ def analyze_dataset(file_path: str, name: str):
     for sentence in sentences:
         sentence_lengths.append(len(sentence.tokens))
         for token in sentence.tokens:
-            if token.upos != '_':
+            if token.upos != "_":
                 upos_tags[token.upos] += 1
-            if token.deprel != '_':
+            if token.deprel != "_":
                 deprel_tags[token.deprel] += 1
 
     print(f"Number of sentences: {num_sentences}")
@@ -32,11 +33,11 @@ def analyze_dataset(file_path: str, name: str):
 
     print("\nTop 10 Universal Part-of-Speech (UPOS) Tags:")
     for tag, count in upos_tags.most_common(10):
-        print(f"  {tag}: {count} ({count/num_tokens:.2%})")
+        print(f"  {tag}: {count} ({count / num_tokens:.2%})")
 
     print("\nTop 10 Dependency Relations (DEPREL):")
     for rel, count in deprel_tags.most_common(10):
-        print(f"  {rel}: {count} ({count/num_tokens:.2%})")
+        print(f"  {rel}: {count} ({count / num_tokens:.2%})")
 
     avg_sentence_length = sum(sentence_lengths) / num_sentences
     max_sentence_length = max(sentence_lengths)
@@ -47,7 +48,8 @@ def analyze_dataset(file_path: str, name: str):
     print(f"  Max: {max_sentence_length} tokens")
     print(f"  Min: {min_sentence_length} tokens")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     data_dir = "data"
     train_file = os.path.join(data_dir, "vi_vtb-ud-train.conllu")
     dev_file = os.path.join(data_dir, "vi_vtb-ud-dev.conllu")
