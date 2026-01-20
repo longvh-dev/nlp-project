@@ -1,4 +1,4 @@
-_target_: src.models.dependency_parser_module.DependencyParserModule
+_target_: src.models.UD_dependency_parser.UDDependencyParser
 vocab_size: ??? # To be resolved at runtime from tokenizer vocab size
 num_relations: ??? # To be resolved at runtime from data module (rel_vocab size)
 embedding_dim: 128

@@ -13,4 +13,4 @@ wandb:
   # entity: "" # set to name of your wandb team
   group: ""
   tags: []
-  job_type: ""
+  job_type: "train"

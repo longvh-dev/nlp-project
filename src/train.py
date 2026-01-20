@@ -4,16 +4,23 @@ import hydra
 import lightning as L
 import rootutils
 import torch
-import torch.serialization # Added for safe global allowlisting
+import torch.serialization  # Added for safe global allowlisting
 from lightning import Callback, LightningDataModule, LightningModule, Trainer
 from lightning.pytorch.loggers import Logger
 from omegaconf import DictConfig
-from transformers.models.phobert.tokenization_phobert import PhobertTokenizer # Explicitly import PhobertTokenizer
-
-rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
+from transformers.models.phobert.tokenization_phobert import (
+    PhobertTokenizer,
+)  # Explicitly import PhobertTokenizer
+import transformers.tokenization_utils  # Import to access Trie for safe global allowlisting
 
 # Allowlist PhobertTokenizer for safe checkpoint loading
-torch.serialization.add_safe_globals([PhobertTokenizer])
+torch.serialization.add_safe_globals(
+    [PhobertTokenizer, transformers.tokenization_utils.Trie]
+)
+
+# -------------------- Setup project root via rootutils -------------------- #
+rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
+
 # ------------------------------------------------------------------------------------ #
 # the setup_root above is equivalent to:
 # - adding project root dir to PYTHONPATH
@@ -64,13 +71,13 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     datamodule.prepare_data()  # Ensure data is ready (e.g., downloaded)
     datamodule.setup()  # Build rel_vocab and tokenizer
 
-    # Dynamically inject vocab_size and num_relations into model config if it's the DependencyParserModule
+    # Dynamically inject vocab_size and num_relations into model config if it's the UDDependencyParser
     if (
         "_target_" in cfg.model
-        and "dependency_parser_module.DependencyParserModule" in cfg.model._target_
+        and "UD_dependency_parser.UDDependencyParser" in cfg.model._target_
     ):
         log.info(
-            "Injecting vocab_size and num_relations into DependencyParserModule config."
+            "Injecting vocab_size and num_relations into UDDependencyParser config."
         )
         if datamodule.tokenizer is None:
             raise ValueError(
